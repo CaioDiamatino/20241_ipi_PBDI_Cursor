@@ -1,33 +1,68 @@
+-- Active: 1710242554065@@127.0.0.1@5432@20241_fatec_ipi_pbdi_cursores
+--cursor com parâmetro nomeado e por ordem
+-- exibir nomes dos youtubers que começaram a partir de 2010
+-- e que têm pelo menos , 60m inscritos
+-- Bloquinho anonimo
+DO $$
+	DECLARE
+	--1. Declaração do cursor
+	v_ano INT := 2010;
+	v_inscritos INT := 60000000;
+	cur_ano_inscritos CURSOR (ano INT, inscritos INT) FOR
+	SELECT youtuber FROM tb_youtubers WHERE started >= ano AND subscribers >= inscritos;
+	v_youtuber VARCHAR(200);
+	BEGIN
+	--2, Abrindo
+		--essa
+		-- OPEN cur_ano_inscritos(v_ano, v_inscritos);
+		-- --ou essa
+		-- OPEN cur_ano_inscritos(inscritos := v_inscritos, ano := v_ano );
+
+		OPEN cur_ano_inscritos(ano := v_ano, inscritos := v_inscritos);
+	LOOP
+		--3. Reculperação
+		--buscar nome
+		FETCH cur_ano_inscritos INTO v_youtuber;
+		--sair se for o caso
+		EXIT WHEN NOT FOUND;
+		--exibir se puder
+		RAISE NOTICE '%', v_youtuber;
+	END LOOP;
+	--4. Fechamento
+	END;
+$$
+
+
 --cursor vinculado(bound)
 --
 --
-DO $$
-	DECLARE
-		--cursor bound
-		--1, Declaração(ainda não esta aberto)
-		cur_nomes_e_inscritos CURSOR FOR
-		SELECT youtuber, subscribers FROM tb_youtubers;
-		tupla RECORD;
-		--tupla.youtuber me dá o youtuber
-		--tupla.subscribers me dá o número de subscribers
-		resultado TEXT DEFAULT '';
-	BEGIN
-		--2. Abertura do cursor
-		OPEN cur_nomes_e_inscritos;
-		--vamos usar um loop While
-		--3. Reculperação de dados
-		FETCH cur_nomes_e_inscritos INTO tupla;
-		WHILE FOUND LOOP
-			--concatenação, operador ||
-			resultado := resultado || tupla.youtuber || ':' || tupla.subscribers || ',';
-			FETCH cur_nomes_e_inscritos INTO tupla;
-			END LOOP;
-		--4. Fechamento
-			CLOSE cur_nomes_e_inscritos;
-			RAISE NOTICE '%', resultado;
-	END;
+-- DO $$
+-- 	DECLARE
+-- 		--cursor bound
+-- 		--1, Declaração(ainda não esta aberto)
+-- 		cur_nomes_e_inscritos CURSOR FOR
+-- 		SELECT youtuber, subscribers FROM tb_youtubers;
+-- 		tupla RECORD;
+-- 		--tupla.youtuber me dá o youtuber
+-- 		--tupla.subscribers me dá o número de subscribers
+-- 		resultado TEXT DEFAULT '';
+-- 	BEGIN
+-- 		--2. Abertura do cursor
+-- 		OPEN cur_nomes_e_inscritos;
+-- 		--vamos usar um loop While
+-- 		--3. Reculperação de dados
+-- 		FETCH cur_nomes_e_inscritos INTO tupla;
+-- 		WHILE FOUND LOOP
+-- 			--concatenação, operador ||
+-- 			resultado := resultado || tupla.youtuber || ':' || tupla.subscribers || ',';
+-- 			FETCH cur_nomes_e_inscritos INTO tupla;
+-- 			END LOOP;
+-- 		--4. Fechamento
+-- 			CLOSE cur_nomes_e_inscritos;
+-- 			RAISE NOTICE '%', resultado;
+-- 	END;
 
-$$
+-- $$
 
 --cursor não vinculado(unbound)
 --cursor query dinâmica, ou seja , uma query representada
